@@ -1,11 +1,15 @@
 <template>
-  <ProjectBoard/>
+  <div>
+    <ProjectBoard />
+  </div>
 </template>
 
 <script>
-import ProjectBoard from '../components/ProjectBoard.vue';
+import ProjectBoard from '~/components/ProjectBoard.vue';
 
 export default {
-  name: 'IndexPage'
-}
+  components: {
+    ProjectBoard,
+  },
+};
 </script>

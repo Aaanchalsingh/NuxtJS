@@ -1,26 +1,34 @@
 <template>
-  <div>
-    <!-- Drag and drop tasks -->
-    <draggable v-model="columns" @end="onDragEnd">
-      <div v-for="(column, index) in columns" :key="index" class="column">
-        <h2>{{ column.title }} ({{ column.tasks.length }})</h2>
-        <div class="tasks">
-          <div v-for="(task, taskIndex) in column.tasks" :key="taskIndex" class="task" @click="openTaskDetails(task)">
-            {{ task.title }}
-          </div>
-          <button @click="addTask(index)">+ New</button>
+  <div class="flex justify-center items-center h-screen">
+    <div class="flex w-full ml-12 mr-12">
+      <div v-for="(column, index) in columns" :key="index" class="flex-1 mr-2">
+        <h2 class="text-xl font-semibold mb-4">{{ column.title }} ({{ column.tasks.length }})</h2>
+        <div class="border border-gray-400 pl-12 rounded">
+          <!-- Ensure draggable is only used in the client-side -->
+          <draggable v-if="isClient" v-model="column.tasks" :options="{ moves: (el, container, handle) => handle.classList.contains('handle') }">
+            <div class="grid grid-cols-1 gap-4">
+              <TaskCard
+                v-for="(task, idx) in column.tasks"
+                :key="idx"
+                :task="task"
+                @edit-task="editTask(task)"
+                @delete-task="deleteTask(task)"
+              />
+            </div>
+          </draggable>
+          <button class="mt-2 font-bold py-2 px-4 rounded" @click="addTask(column.title)">+ New</button>
         </div>
       </div>
-    </draggable>
+    </div>
   </div>
 </template>
 
 <script>
-import draggable from 'vue-draggable';
+import TaskCard from '~/components/TaskCard.vue';
 
 export default {
   components: {
-    draggable,
+    TaskCard,
   },
   data() {
     return {
@@ -31,32 +39,37 @@ export default {
       ]
     };
   },
+  computed: {
+    // Check if the code is running in the client-side
+    isClient() {
+      return process.client;
+    }
+  },
   methods: {
-    addTask(index) {
+    addTask(status) {
       const title = prompt('Enter task title:');
       if (title) {
-        this.columns[index].tasks.push({ title });
+        this.columns.find(column => column.title === status).tasks.push({ title });
       }
     },
-    openTaskDetails(task) {
-      // Implement logic to open task details page/modal
+    editTask(task) {
+      const newTitle = prompt('Enter new task title:', task.title);
+      if (newTitle !== null) {
+        task.title = newTitle;
+      }
     },
-    onDragEnd(event) {
-      // Implement logic to handle task movement after drag and drop
+    deleteTask(task) {
+      if (confirm('Are you sure you want to delete this task?')) {
+        // Loop through all columns to find and delete the task
+        for (const column of this.columns) {
+          const index = column.tasks.indexOf(task);
+          if (index !== -1) {
+            column.tasks.splice(index, 1);
+            break; // Exit loop once task is deleted
+          }
+        }
+      }
     }
   }
 };
 </script>
-
-<style>
-/* Add your CSS styles here */
-.column {
-  /* Style for columns */
-}
-.tasks {
-  /* Style for tasks container */
-}
-.task {
-  /* Style for individual tasks */
-}
-</style>
