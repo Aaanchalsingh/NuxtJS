@@ -1,101 +1,62 @@
 <template>
-  <div class="flex">
-    <div v-for="(column, index) in columns" :key="index" class="flex-1 mr-4">
-      <h2>{{ column.title }}</h2>
-      <div class="mt-4">
-        <!-- Ensure draggable is only used in the client-side -->
-        <draggable
-          v-if="isClient"
-          v-model="column.tasks"
-          :options="dragOptions"
-          class="drag-container"
-        >
-          <task-card
-            v-for="(task, idx) in column.tasks"
-            :key="idx"
-            :task="task"
-            @edit="editTask(task)"
-            @delete="deleteTask(task)"
-          />
-        </draggable>
-        <button
-          class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          @click="addTask(column.title)"
-        >
-          + New
-        </button>
+  <div>
+    <!-- Drag and drop tasks -->
+    <draggable v-model="columns" @end="onDragEnd">
+      <div v-for="(column, index) in columns" :key="index" class="column">
+        <h2>{{ column.title }} ({{ column.tasks.length }})</h2>
+        <div class="tasks">
+          <div v-for="(task, taskIndex) in column.tasks" :key="taskIndex" class="task" @click="openTaskDetails(task)">
+            {{ task.title }}
+          </div>
+          <button @click="addTask(index)">+ New</button>
+        </div>
       </div>
-    </div>
+    </draggable>
   </div>
 </template>
 
 <script>
-import TaskCard from "~/components/TaskCard.vue";
-import draggable from 'vue-dragula';
+import draggable from 'vue-draggable';
 
 export default {
   components: {
-    TaskCard,
+    draggable,
   },
   data() {
     return {
       columns: [
-        { title: "To Do", tasks: [] },
-        { title: "In Progress", tasks: [] },
-        { title: "Completed", tasks: [] },
-      ],
-      dragOptions: {
-        moves: (el, container, handle) => handle.classList.contains("handle"),
-      },
+        { title: 'To Do', tasks: [] },
+        { title: 'In Progress', tasks: [] },
+        { title: 'Completed', tasks: [] }
+      ]
     };
   },
-  computed: {
-    isClient() {
-      return process.client;
-    },
-  },
   methods: {
-    addTask(status) {
-      const title = prompt("Enter task title:");
+    addTask(index) {
+      const title = prompt('Enter task title:');
       if (title) {
-        this.columns
-          .find((column) => column.title === status)
-          .tasks.push({ title });
+        this.columns[index].tasks.push({ title });
       }
     },
-    editTask(task) {
-      const newTitle = prompt("Enter new task title:", task.title);
-      if (newTitle !== null) {
-        task.title = newTitle;
-      }
+    openTaskDetails(task) {
+      // Implement logic to open task details page/modal
     },
-    deleteTask(task) {
-      if (confirm("Are you sure you want to delete this task?")) {
-        const columnIndex = this.columns.findIndex((column) =>
-          column.tasks.includes(task)
-        );
-        if (columnIndex !== -1) {
-          const column = this.columns[columnIndex];
-          const taskIndex = column.tasks.indexOf(task);
-          if (taskIndex !== -1) {
-            column.tasks.splice(taskIndex, 1);
-          }
-        }
-      }
-    },
-  },
-  mounted() {
-    if (process.client) {
-      this.$nextTick(() => {
-        draggable();
-      });
+    onDragEnd(event) {
+      // Implement logic to handle task movement after drag and drop
     }
-  },
+  }
 };
 </script>
 
-<style scoped>
-.drag-container {
-  min-height: 100px;
+<style>
+/* Add your CSS styles here */
+.column {
+  /* Style for columns */
+}
+.tasks {
+  /* Style for tasks container */
+}
+.task {
+  /* Style for individual tasks */
 }
 </style>
