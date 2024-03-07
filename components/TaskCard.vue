@@ -3,8 +3,8 @@
     <div class="flex justify-between">
       <h3>{{ task.title }}</h3>
       <div class="relative" @click="toggleOptions">
-        <button class="handle">☰</button>
-        <div v-if="showOptions" class="absolute right-0 mt-2 bg-white border border-gray-200 p-2 rounded shadow">
+        <button class="handle">...</button>
+        <div v-if="showOptions" class="absolute right-0 mt-2 bg-white border border-gray-800 p-2 rounded shadow">
           <button @click="editTask">Edit</button>
           <button @click="deleteTask">Delete</button>
         </div>
