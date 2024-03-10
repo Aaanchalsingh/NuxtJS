@@ -10,7 +10,11 @@
               </h2>
               <span class="text-gray-500 ml-5">{{ column.tasks.length }}</span>
             </div>
-            <span class="text-2xl font-bold" @click="addTask(column.title)">+</span>
+            <span
+              class="text-2xl font-bold cursor-pointer"
+              @click="addTask(column.title)"
+              >+</span
+            >
           </div>
 
           <!-- Render an empty drop zone -->
@@ -36,6 +40,9 @@
                 @delete-task="deleteTask(task)"
               />
             </div>
+            <button class="text-2xl text-gray-600 hover:text-gray-900">
+              +&nbsp; NEW
+            </button>
           </div>
         </div>
       </div>
